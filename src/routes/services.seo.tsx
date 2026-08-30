@@ -3,6 +3,7 @@ import { ArrowLeft, Check } from "lucide-react";
 
 import { Reveal } from "@/components/Reveal";
 import { Section } from "@/components/Section";
+import { OG_IMAGE, absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/services/seo")({
   head: () => ({
@@ -18,10 +19,29 @@ export const Route = createFileRoute("/services/seo")({
         property: "og:description",
         content: "地域×業態戦略にもとづくローカルSEOとLP制作で、中期的に集客を積み上げます。",
       },
-      { property: "og:url", content: "/services/seo" },
+      { property: "og:url", content: absoluteUrl("/services/seo") },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: OG_IMAGE },
     ],
-    links: [{ rel: "canonical", href: "/services/seo" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/services/seo") }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "ホーム", item: absoluteUrl("/") },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: "SEO Growth",
+              item: absoluteUrl("/services/seo"),
+            },
+          ],
+        }),
+      },
+    ],
   }),
   component: SeoPage,
 });
@@ -58,17 +78,10 @@ function SeoPage() {
 
       <Section tone="ink" title="必要かどうかも、診断でご案内します。">
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Link
-            to="/"
-            hash="diagnosis"
-            className="inline-flex min-h-13 items-center justify-center bg-primary px-7 text-sm text-primary-foreground"
-          >
+          <Link to="/" hash="diagnosis" className="btn btn-primary">
             無料Web診断を依頼する
           </Link>
-          <Link
-            to="/"
-            className="inline-flex min-h-13 items-center justify-center gap-2 border border-ink-border px-7 text-sm"
-          >
+          <Link to="/" className="btn btn-on-ink">
             <ArrowLeft className="size-4" aria-hidden="true" />
             トップに戻る
           </Link>

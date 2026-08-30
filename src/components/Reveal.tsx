@@ -2,6 +2,10 @@ import { useEffect, useRef, useState, type ElementType, type ReactNode } from "r
 
 import { cn } from "@/lib/utils";
 
+const prefersReducedMotion = () =>
+  typeof window !== "undefined" &&
+  window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
+
 export function Reveal({
   children,
   className,
@@ -19,20 +23,31 @@ export function Reveal({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (typeof IntersectionObserver === "undefined") {
+    if (typeof IntersectionObserver === "undefined" || prefersReducedMotion()) {
       setVisible(true);
       return;
     }
+
+    // A deep link to #pricing, a restored scroll position, or a fast flick can
+    // carry an element past the viewport between observer samples, leaving it
+    // stuck at opacity 0 forever. Anything already at or above the fold is
+    // revealed outright.
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight) {
+      setVisible(true);
+      return;
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) {
+          if (entry.isIntersecting || entry.boundingClientRect.top < 0) {
             setVisible(true);
             observer.disconnect();
           }
         }
       },
-      { rootMargin: "0px 0px -12% 0px", threshold: 0.08 },
+      { rootMargin: "0px 0px -8% 0px", threshold: 0 },
     );
     observer.observe(el);
     return () => observer.disconnect();

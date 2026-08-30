@@ -4,6 +4,7 @@ import { ArrowLeft, Check } from "lucide-react";
 import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
 import { Reveal } from "@/components/Reveal";
 import { Section } from "@/components/Section";
+import { OG_IMAGE, absoluteUrl } from "@/lib/site";
 import heroAfter from "@/assets/hero-after.jpg";
 import heroBefore from "@/assets/hero-before.jpg";
 
@@ -22,10 +23,29 @@ export const Route = createFileRoute("/services/web-renewal")({
         content:
           "料理を主役に、スマホから考える飲食店向けWebリニューアル。予約まで迷わせない設計を行います。",
       },
-      { property: "og:url", content: "/services/web-renewal" },
+      { property: "og:url", content: absoluteUrl("/services/web-renewal") },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: OG_IMAGE },
     ],
-    links: [{ rel: "canonical", href: "/services/web-renewal" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/services/web-renewal") }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "ホーム", item: absoluteUrl("/") },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: "Web Renewal",
+              item: absoluteUrl("/services/web-renewal"),
+            },
+          ],
+        }),
+      },
+    ],
   }),
   component: WebRenewalPage,
 });
@@ -58,6 +78,7 @@ function WebRenewalPage() {
             afterSrc={heroAfter}
             beforeAlt="リニューアル前の古い飲食店サイト"
             afterAlt="リニューアル後の料理写真主役のサイト"
+            sizes="(min-width: 1024px) 64rem, calc(100vw - 2.5rem)"
           />
         </Reveal>
       </Section>
@@ -78,17 +99,10 @@ function WebRenewalPage() {
 
       <Section tone="ink" title="まずは、現状の診断から。">
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Link
-            to="/"
-            hash="diagnosis"
-            className="inline-flex min-h-13 items-center justify-center bg-primary px-7 text-sm text-primary-foreground"
-          >
+          <Link to="/" hash="diagnosis" className="btn btn-primary">
             無料Web診断を依頼する
           </Link>
-          <Link
-            to="/"
-            className="inline-flex min-h-13 items-center justify-center gap-2 border border-ink-border px-7 text-sm"
-          >
+          <Link to="/" className="btn btn-on-ink">
             <ArrowLeft className="size-4" aria-hidden="true" />
             トップに戻る
           </Link>

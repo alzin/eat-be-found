@@ -30,7 +30,13 @@ export function Section({
   return (
     <section
       id={id}
-      className={cn("scroll-mt-20 px-5 py-20 md:px-8 md:py-28", toneClass, className)}
+      className={cn(
+        // Clears the sticky header plus a little breathing room when an anchor
+        // link lands here.
+        "scroll-mt-24 px-5 py-20 md:px-8 md:py-28",
+        toneClass,
+        className,
+      )}
     >
       <div className="mx-auto max-w-6xl">
         {(eyebrow || title || lead) && (
@@ -38,22 +44,26 @@ export function Section({
             {eyebrow ? (
               <p
                 className={cn(
-                  "text-xs tracking-[0.28em]",
+                  "flex items-center gap-3 text-xs tracking-[0.28em]",
                   tone === "ink" ? "text-kohaku" : "text-primary",
                 )}
               >
+                <span
+                  aria-hidden="true"
+                  className={cn("h-px w-6", tone === "ink" ? "bg-kohaku/60" : "bg-primary/60")}
+                />
                 {eyebrow}
               </p>
             ) : null}
             {title ? (
-              <h2 className="mt-4 font-mincho text-[1.75rem] leading-[1.35] md:text-[2.6rem]">
+              <h2 className="jp-wrap mt-5 font-mincho text-[clamp(1.55rem,5.4vw,1.75rem)] leading-[1.4] md:text-[2.6rem] md:leading-[1.35]">
                 {title}
               </h2>
             ) : null}
             {lead ? (
               <p
                 className={cn(
-                  "mt-5 text-sm leading-relaxed md:text-base",
+                  "jp-wrap mt-5 text-sm leading-[1.9] md:text-base",
                   tone === "ink" ? "text-ink-muted" : "text-muted-foreground",
                 )}
               >
