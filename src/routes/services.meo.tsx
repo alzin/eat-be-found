@@ -3,6 +3,7 @@ import { ArrowLeft, Check } from "lucide-react";
 
 import { Reveal } from "@/components/Reveal";
 import { Section } from "@/components/Section";
+import { OG_IMAGE, absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/services/meo")({
   head: () => ({
@@ -16,13 +17,31 @@ export const Route = createFileRoute("/services/meo")({
       { property: "og:title", content: "MEO Management｜Googleマップ運用代行" },
       {
         property: "og:description",
-        content:
-          "忙しい店舗の代わりに、Googleマップを継続運用。発見の瞬間から予約までを整えます。",
+        content: "忙しい店舗の代わりに、Googleマップを継続運用。発見の瞬間から予約までを整えます。",
       },
-      { property: "og:url", content: "/services/meo" },
+      { property: "og:url", content: absoluteUrl("/services/meo") },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: OG_IMAGE },
     ],
-    links: [{ rel: "canonical", href: "/services/meo" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/services/meo") }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "ホーム", item: absoluteUrl("/") },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: "MEO Management",
+              item: absoluteUrl("/services/meo"),
+            },
+          ],
+        }),
+      },
+    ],
   }),
   component: MeoPage,
 });
@@ -88,17 +107,10 @@ function MeoPage() {
 
       <Section tone="muted" title="MEOだけのご依頼も承ります。">
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Link
-            to="/"
-            hash="diagnosis"
-            className="inline-flex min-h-13 items-center justify-center bg-primary px-7 text-sm text-primary-foreground"
-          >
+          <Link to="/" hash="diagnosis" className="btn btn-primary">
             無料でマップを診断する
           </Link>
-          <Link
-            to="/"
-            className="inline-flex min-h-13 items-center justify-center gap-2 border border-foreground/25 px-7 text-sm"
-          >
+          <Link to="/" className="btn btn-outline">
             <ArrowLeft className="size-4" aria-hidden="true" />
             トップに戻る
           </Link>

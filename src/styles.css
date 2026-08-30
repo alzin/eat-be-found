@@ -36,6 +36,10 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-line: var(--line);
+  --color-line-foreground: var(--line-foreground);
+  --color-line-bright: var(--line-bright);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -78,7 +82,10 @@
   --card-foreground: oklch(0.215 0.014 55);
   --popover: oklch(0.995 0.004 85);
   --popover-foreground: oklch(0.215 0.014 55);
-  --primary: oklch(0.575 0.155 45);
+  /* 0.53 keeps the terracotta but clears 4.5:1 as text on both the page and
+     the muted section ground, and behind white button labels. */
+  --primary: oklch(0.53 0.155 45);
+  --primary-hover: oklch(0.465 0.15 45);
   --primary-foreground: oklch(0.99 0.005 85);
   --secondary: oklch(0.945 0.014 80);
   --secondary-foreground: oklch(0.28 0.02 55);
@@ -90,7 +97,7 @@
   --destructive-foreground: oklch(0.985 0.007 85);
   --border: oklch(0.895 0.014 80);
   --input: oklch(0.895 0.014 80);
-  --ring: oklch(0.575 0.155 45);
+  --ring: oklch(0.53 0.155 45);
   --ink: oklch(0.185 0.011 50);
   --ink-foreground: oklch(0.965 0.008 85);
   --ink-muted: oklch(0.735 0.014 80);
@@ -98,6 +105,19 @@
   --sumi: oklch(0.26 0.012 50);
   --kaki: oklch(0.615 0.165 45);
   --kohaku: oklch(0.755 0.125 70);
+  /*
+   * LINE green, in two grounds.
+   *
+   * LINE's official #06C755 carries only 2.2:1 against white text and 2.16:1
+   * as ink on this page, so it cannot be the surface of a labelled button.
+   * --line is the same hue taken dark enough to clear AA on light grounds;
+   * --line-bright is the official green, which reaches 8.3:1 on --ink and is
+   * used for the mark on dark sections.
+   */
+  --line: oklch(0.5 0.17 150);
+  --line-hover: oklch(0.44 0.16 150);
+  --line-foreground: oklch(0.99 0.005 85);
+  --line-bright: #06c755;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -105,14 +125,13 @@
   --chart-5: oklch(0.769 0.188 70.08);
   --sidebar: oklch(0.985 0.007 85);
   --sidebar-foreground: oklch(0.215 0.014 55);
-  --sidebar-primary: oklch(0.575 0.155 45);
+  --sidebar-primary: oklch(0.53 0.155 45);
   --sidebar-primary-foreground: oklch(0.99 0.005 85);
   --sidebar-accent: oklch(0.945 0.014 80);
   --sidebar-accent-foreground: oklch(0.28 0.02 55);
   --sidebar-border: oklch(0.895 0.014 80);
-  --sidebar-ring: oklch(0.575 0.155 45);
+  --sidebar-ring: oklch(0.53 0.155 45);
 }
-
 
 .dark {
   --background: oklch(0.185 0.011 50);
@@ -122,6 +141,7 @@
   --popover: oklch(0.235 0.012 50);
   --popover-foreground: oklch(0.965 0.008 85);
   --primary: oklch(0.685 0.155 50);
+  --primary-hover: oklch(0.755 0.145 55);
   --primary-foreground: oklch(0.185 0.011 50);
   --secondary: oklch(0.28 0.014 55);
   --secondary-foreground: oklch(0.965 0.008 85);
@@ -134,6 +154,10 @@
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 16%);
   --ring: oklch(0.685 0.155 50);
+  --line: oklch(0.74 0.19 152);
+  --line-hover: oklch(0.8 0.17 155);
+  --line-foreground: oklch(0.185 0.011 50);
+  --line-bright: #06c755;
   --sidebar: oklch(0.235 0.012 50);
   --sidebar-foreground: oklch(0.965 0.008 85);
   --sidebar-primary: oklch(0.685 0.155 50);
@@ -155,11 +179,6 @@
     font-family: var(--font-sans);
     font-feature-settings: "palt" 1;
   }
-}
-
-@utility font-mincho {
-  font-family: var(--font-serif);
-  font-feature-settings: "palt" 1;
 }
 
 @utility reveal {
@@ -192,3 +211,187 @@
   }
 }
 
+/*
+ * Japanese typography.
+ *
+ * `word-break: auto-phrase` lets Chromium break lines at bunsetsu (phrase)
+ * boundaries instead of anywhere, which is what stops headings from splitting
+ * words such as 一部 or 終わらせない. `line-break: strict` applies full kinsoku
+ * rules everywhere else. Both degrade to normal CJK breaking when unsupported.
+ */
+@utility jp-wrap {
+  line-break: strict;
+  overflow-wrap: anywhere;
+  word-break: auto-phrase;
+}
+
+/* Phrase unit: the browser prefers breaking between these before inside one. */
+@utility jp-phrase {
+  display: inline-block;
+}
+
+@utility font-mincho {
+  font-family: var(--font-serif);
+  font-feature-settings: "palt" 1;
+  letter-spacing: 0.01em;
+}
+
+/* Shared button surface. Variants below only change colour. */
+@utility btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3.25rem;
+  padding-block: 0.75rem;
+  padding-inline: 1.75rem;
+  font-size: 0.875rem;
+  line-height: 1.35;
+  /* Long Japanese labels must be allowed to wrap: `nowrap` made the primary
+     CTA wider than the viewport on very narrow screens and pushed the whole
+     page into horizontal scroll. */
+  text-align: center;
+  text-wrap: balance;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &:active {
+      transform: none;
+    }
+  }
+}
+
+@utility btn-sm {
+  min-height: 2.75rem;
+  padding-inline: 1.25rem;
+}
+
+@utility btn-primary {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  box-shadow: 0 1px 2px oklch(0.215 0.014 55 / 0.16);
+
+  &:hover {
+    background-color: var(--primary-hover);
+    box-shadow: 0 6px 18px oklch(0.53 0.155 45 / 0.3);
+  }
+}
+
+@utility btn-outline {
+  border: 1px solid var(--border);
+  background-color: var(--card);
+  color: var(--foreground);
+
+  &:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+}
+
+@utility btn-line {
+  background-color: var(--line);
+  color: var(--line-foreground);
+  box-shadow: 0 1px 2px oklch(0.215 0.014 55 / 0.16);
+
+  &:hover {
+    background-color: var(--line-hover);
+    box-shadow: 0 6px 18px oklch(0.5 0.17 150 / 0.28);
+  }
+}
+
+@utility btn-line-outline {
+  border: 1px solid var(--line);
+  color: var(--line);
+
+  &:hover {
+    background-color: var(--line);
+    color: var(--line-foreground);
+  }
+}
+
+@utility btn-on-ink {
+  border: 1px solid var(--ink-border);
+  color: var(--ink-foreground);
+
+  &:hover {
+    border-color: var(--kohaku);
+    background-color: var(--sumi);
+  }
+}
+
+/* Consistent keyboard affordance for links and non-btn controls. */
+@utility focus-ring {
+  &:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+  }
+}
+
+@utility focus-ring-ink {
+  &:focus-visible {
+    outline: 2px solid var(--kohaku);
+    outline-offset: 3px;
+  }
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Right-edge fade telling the reader a horizontal track continues. */
+@utility track-fade {
+  mask-image: linear-gradient(to right, #000 calc(100% - 3rem), transparent 100%);
+}
+
+@layer base {
+  ::selection {
+    background-color: var(--kohaku);
+    color: var(--sumi);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  h1,
+  h2,
+  h3 {
+    line-break: strict;
+    word-break: auto-phrase;
+    text-wrap: pretty;
+  }
+}
