@@ -35,7 +35,11 @@ jobs:
       - name: Build
         run: bun run build
 
+      # enablement: true turns Pages on (build_type=workflow) on the first run,
+      # so the repo needs no manual Settings > Pages step.
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
